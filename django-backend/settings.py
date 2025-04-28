@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -127,3 +128,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
 ]
+
+# Agrega orígenes adicionales desde una variable de entorno, separados por coma
+extra_origins = os.environ.get('CSRF_EXTRA_ORIGINS')
+if extra_origins:
+    CSRF_TRUSTED_ORIGINS += [origin.strip() for origin in extra_origins.split(',')]
