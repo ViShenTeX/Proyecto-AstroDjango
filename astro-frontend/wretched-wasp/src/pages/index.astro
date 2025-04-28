@@ -1,11 +1,54 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+import Carousel from '../components/Carousel.jsx';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+type Random = {
+  titulo: string;
+  descripcion: string;
+  imagen: string | null;
+};
+
+const response = await fetch('http://127.0.0.1:8000/api/random/');
+const randoms = await response.json();
+
+let current = 0;
+function prev() {
+  current = (current - 1 + randoms.length) % randoms.length;
+}
+function next() {
+  current = (current + 1) % randoms.length;
+}
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<head>
+  <meta charset="UTF-8" />
+  <title>Movidas raras</title>
+</head>
+
+<div class="flex flex-col min-h-screen">
+  <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 py-12 px-4 shadow-lg">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <h1 class="text-4xl font-extrabold text-white drop-shadow-lg">Movidas raras</h1>
+      <a href="/admin" class="flex items-center gap-2 bg-white bg-opacity-80 hover:bg-opacity-100 p-3 rounded-full transition" title="Admin">
+        <!-- Icono de candado (admin/login) en negro -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 17a2 2 0 002-2v-2a2 2 0 00-2-2 2 2 0 00-2 2v2a2 2 0 002 2zm6-6V9a6 6 0 10-12 0v2a2 2 0 00-2 2v7a2 2 0 002 2h12a2 2 0 002-2v-7a2 2 0 00-2-2zm-2 0H8V9a4 4 0 118 0v2z" />
+        </svg>
+        <span class="text-black font-semibold">Login Admin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="flex-1 flex flex-col items-center justify-center min-h-[60vh]">
+    <Carousel items={randoms} client:load />
+  </div>
+
+  <footer class="bg-gray-900 text-gray-200 py-6 mt-12 shadow-inner">
+    <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+      <span>Página creada por Vichicho</span>
+      <span>Página hecha con Astro/Tailwind CSS y Django</span>
+    </div>
+  </footer>
+</div>
+
+
