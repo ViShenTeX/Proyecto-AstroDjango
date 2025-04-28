@@ -8,7 +8,7 @@ type Random = {
   imagen: string | null;
 };
 
-const response = await fetch('http://127.0.0.1:8000/api/random/');
+const response = await fetch('http://0.0.0.0:8000/api/random/');
 const randoms = await response.json();
 
 let current = 0;
