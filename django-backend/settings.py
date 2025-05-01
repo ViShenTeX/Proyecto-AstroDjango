@@ -1,5 +1,5 @@
 from pathlib import Path
-import os
+import requests
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -122,14 +122,23 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True  # Solo para desarrollo
+CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
 ]
 
-# Agrega orígenes adicionales desde una variable de entorno, separados por coma
-extra_origins = os.environ.get('CSRF_EXTRA_ORIGINS')
-if extra_origins:
-    CSRF_TRUSTED_ORIGINS += [origin.strip() for origin in extra_origins.split(',')]
+# Versión mejorada para Amazon Linux
+if DEBUG:
+    try:
+        # Amazon EC2 metadata endpoint - funcionará en Amazon Linux
+        metadata_url = 'http://169.254.169.254/latest/meta-data/public-ipv4'
+        public_ip = requests.get(metadata_url, timeout=2).text.strip()
+        if public_ip:
+            CSRF_TRUSTED_ORIGINS.extend([
+                f'http://{public_ip}:3000',
+                f'https://{public_ip}:3000'
+            ])
+    except Exception as e:
+        print(f"No se pudo obtener la IP pública: {e}")
