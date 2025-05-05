@@ -6,6 +6,8 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     server: {
+      port: 80,
+      host: '0.0.0.0',
       proxy: {
         '/admin': {
           target: 'http://localhost:8000',
