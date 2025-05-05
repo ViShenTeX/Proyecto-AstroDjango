@@ -125,8 +125,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
+    'http://localhost',
+    'http://127.0.0.1',
 ]
 
 # Versión mejorada para Amazon Linux
@@ -137,8 +137,8 @@ if DEBUG:
         public_ip = requests.get(metadata_url, timeout=2).text.strip()
         if public_ip:
             CSRF_TRUSTED_ORIGINS.extend([
-                f'http://{public_ip}:3000',
-                f'https://{public_ip}:3000'
+                f'http://{public_ip}',
+                f'https://{public_ip}'
             ])
     except Exception as e:
         print(f"No se pudo obtener la IP pública: {e}")
