@@ -1,6 +1,5 @@
 from pathlib import Path
 import requests
-import socket
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -123,22 +122,23 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-def get_dynamic_origins():
+CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
+
+# Versión mejorada para Amazon Linux
+if DEBUG:
     try:
-        response = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4', timeout=1)
-        public_ip = response.text.strip()
-        return [
-            f'http://{public_ip}',          # Tráfico directo (puerto 80)
-            f'http://{public_ip}:8000',      # Acceso directo a Django
-            'http://localhost:8000'          # Para desarrollo local
-        ]
-    except Exception:
-        return ['*']  # Fallback temporal
-
-CSRF_TRUSTED_ORIGINS = get_dynamic_origins()
-
-# Configuración de seguridad (ajustar para producción)
-ALLOWED_HOSTS = ['*']
-CORS_ALLOW_ALL_ORIGINS = True  # Solo para desarrollo!
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+        # Amazon EC2 metadata endpoint - funcionará en Amazon Linux
+        metadata_url = 'http://169.254.169.254/latest/meta-data/public-ipv4'
+        public_ip = requests.get(metadata_url, timeout=2).text.strip()
+        if public_ip:
+            CSRF_TRUSTED_ORIGINS.extend([
+                f'http://{public_ip}:3000',
+                f'https://{public_ip}:3000'
+            ])
+    except Exception as e:
+        print(f"No se pudo obtener la IP pública: {e}")
