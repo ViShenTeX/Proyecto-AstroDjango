@@ -1,5 +1,6 @@
 from pathlib import Path
 import requests
+import socket
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -122,26 +123,69 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Permitir solicitudes CORS desde cualquier origen
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
-# Actualizados para reflejar la nueva configuración de puertos
+# Configuración básica de orígenes confiables para CSRF
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     'http://127.0.0.1',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'http://localhost:80',
+    'http://127.0.0.1:80',
 ]
 
-# Versión mejorada para Amazon Linux
+# Añadir direcciones IP privadas de la máquina
+try:
+    hostname = socket.gethostname()
+    ip_addresses = socket.gethostbyname_ex(hostname)[2]
+    for ip in ip_addresses:
+        CSRF_TRUSTED_ORIGINS.extend([
+            f'http://{ip}',
+            f'http://{ip}:8000',
+            f'http://{ip}:80',
+        ])
+except Exception as e:
+    print(f"No se pudieron obtener las IPs locales: {e}")
+
+# Versión mejorada para Amazon Linux con múltiples intentos de obtener la IP pública
 if DEBUG:
+    # Primer método: usando el endpoint de metadatos de EC2
     try:
-        # Amazon EC2 metadata endpoint - funcionará en Amazon Linux
         metadata_url = 'http://169.254.169.254/latest/meta-data/public-ipv4'
         public_ip = requests.get(metadata_url, timeout=2).text.strip()
         if public_ip:
             CSRF_TRUSTED_ORIGINS.extend([
                 f'http://{public_ip}',
                 f'http://{public_ip}:8000',
+                f'http://{public_ip}:80',
+                f'https://{public_ip}',
+                f'https://{public_ip}:8000',
+                f'https://{public_ip}:80',
             ])
+            print(f"IP pública detectada (EC2 metadata): {public_ip}")
     except Exception as e:
-        print(f"No se pudo obtener la IP pública: {e}")
+        print(f"No se pudo obtener la IP pública desde EC2 metadata: {e}")
+        
+        # Segundo método: intentar con servicios externos si el primero falla
+        try:
+            public_ip = requests.get('https://api.ipify.org', timeout=3).text.strip()
+            if public_ip:
+                CSRF_TRUSTED_ORIGINS.extend([
+                    f'http://{public_ip}',
+                    f'http://{public_ip}:8000',
+                    f'http://{public_ip}:80',
+                    f'https://{public_ip}',
+                    f'https://{public_ip}:8000',
+                    f'https://{public_ip}:80',
+                ])
+                print(f"IP pública detectada (ipify): {public_ip}")
+        except Exception as e:
+            print(f"No se pudo obtener la IP pública desde ipify: {e}")
+
+# Para depuración, imprimir todos los orígenes confiables
+print("CSRF_TRUSTED_ORIGINS configurados:")
+for origin in CSRF_TRUSTED_ORIGINS:
+    print(f"  {origin}")
