@@ -9,20 +9,28 @@ export default defineConfig({
       port: 80,
       proxy: {
         '/admin': {
-          target: 'http://localhost:8000',
+          target: 'http://127.0.0.1:8000',
           changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path
         },
         '/api': {
-          target: 'http://localhost:8000',
+          target: 'http://127.0.0.1:8000',
           changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path
         },
         '/static': {
-          target: 'http://localhost:8000',
+          target: 'http://127.0.0.1:8000',
           changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path
         },
         '/media': {
-          target: 'http://localhost:8000',
+          target: 'http://127.0.0.1:8000',
           changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path
         }
       }
     }
