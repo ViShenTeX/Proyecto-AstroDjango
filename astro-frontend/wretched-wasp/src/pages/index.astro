@@ -9,8 +9,7 @@ type Random = {
 };
 
 // Obtener la URL base del API
-const API_HOST = import.meta.env.PUBLIC_API_HOST || `http://${Astro.url.hostname}`;
-const response = await fetch(`${API_HOST}/api/random/`);
+const response = await fetch(`${import.meta.env.PUBLIC_API_HOST}/api/random/`);
 const randoms = await response.json();
 
 let current = 0;

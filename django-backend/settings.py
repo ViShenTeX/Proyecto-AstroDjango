@@ -123,35 +123,22 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuración CORS extremadamente permisiva
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_METHODS = ['*']
-CORS_ALLOW_HEADERS = ['*']
+def get_dynamic_origins():
+    try:
+        response = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4', timeout=1)
+        public_ip = response.text.strip()
+        return [
+            f'http://{public_ip}',          # Tráfico directo (puerto 80)
+            f'http://{public_ip}:8000',      # Acceso directo a Django
+            'http://localhost:8000'          # Para desarrollo local
+        ]
+    except Exception:
+        return ['*']  # Fallback temporal
 
-# Añadir cualquier origen al CSRF
-CSRF_TRUSTED_ORIGINS = [
-    'http://*',
-    'https://*',
-]
+CSRF_TRUSTED_ORIGINS = get_dynamic_origins()
 
-# Intentar obtener IP pública para depuración
-try:
-    metadata_url = 'http://169.254.169.254/latest/meta-data/public-ipv4'
-    public_ip = requests.get(metadata_url, timeout=2).text.strip()
-    if public_ip:
-        print(f"EC2 IP pública: {public_ip}")
-except Exception as e:
-    print(f"No se pudo obtener la IP pública desde EC2: {e}")
-
-# Intentar obtener IPs locales para depuración
-try:
-    hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
-    print(f"IP local: {local_ip}")
-except Exception as e:
-    print(f"No se pudo obtener la IP local: {e}")
-
-# Para entornos de desarrollo, también puedes desactivar CSRF
+# Configuración de seguridad (ajustar para producción)
+ALLOWED_HOSTS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True  # Solo para desarrollo!
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False

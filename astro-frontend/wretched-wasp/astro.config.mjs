@@ -7,6 +7,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
     server: {
       port: 80,
+      host: true,
       proxy: {
         '/admin': {
           target: 'http://127.0.0.1:8000',
