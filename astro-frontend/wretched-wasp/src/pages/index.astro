@@ -9,7 +9,8 @@ type Random = {
 };
 
 // Obtener la URL base del API
-const response = await fetch(`${import.meta.env.PUBLIC_API_HOST}/api/random/`);
+const API_HOST = import.meta.env.PUBLIC_API_HOST || `http://${Astro.url.hostname}:8000`;
+const response = await fetch(`${API_HOST}/api/random/`);
 const randoms = await response.json();
 
 let current = 0;
@@ -30,7 +31,7 @@ function next() {
   <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 py-12 px-4 shadow-lg">
     <div class="max-w-4xl mx-auto flex items-center justify-between">
       <h1 class="text-4xl font-extrabold text-white drop-shadow-lg">Movidas raras</h1>
-      <a href="/admin" class="flex items-center gap-2 bg-white bg-opacity-80 hover:bg-opacity-100 p-3 rounded-full transition" title="Admin">
+      <a href="{`${API_HOST}/admin`}" class="flex items-center gap-2 bg-white bg-opacity-80 hover:bg-opacity-100 p-3 rounded-full transition" title="Admin">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 17a2 2 0 002-2v-2a2 2 0 00-2-2 2 2 0 00-2 2v2a2 2 0 002 2zm6-6V9a6 6 0 10-12 0v2a2 2 0 00-2 2v7a2 2 0 002 2h12a2 2 0 002-2v-7a2 2 0 00-2-2zm-2 0H8V9a4 4 0 118 0v2z" />
         </svg>
