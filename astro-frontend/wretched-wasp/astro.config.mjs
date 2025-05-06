@@ -19,6 +19,10 @@ export default defineConfig({
         '/static': {
           target: 'http://localhost:8000',
           changeOrigin: true,
+        },
+        '/media': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
         }
       }
     }
