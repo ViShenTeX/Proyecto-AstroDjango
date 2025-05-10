@@ -69,7 +69,7 @@ export default function Carousel({ items }) {
   const getImageUrl = (item) =>
     item.imagen?.startsWith("http")
       ? item.imagen
-      : `http://127.0.0.1:8000${item.imagen}`;
+      : `http://127.0.0.1:3000${item.imagen}`;
 
   return (
     <div
